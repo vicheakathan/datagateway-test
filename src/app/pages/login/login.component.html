@@ -1,0 +1,53 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="display_flex atk_width flex-column align-items-center justify-content-center">
+        <!-- <img src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">                 -->
+        <div>
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:10px">
+                <div class="text-center mb-3">
+                    <a href="/"><img id="login-logo" src="assets/images/atechlogo.png" alt="Image" height="70" class="mb-5"></a>
+                    <div class="text-900 text-3xl font-medium mb-3">Sign in</div>
+                    <!-- <h4 class="text-900 font-medium">Sign in</h4> -->
+                </div>
+               
+                <form [formGroup]="loginForm" (ngSubmit)="onFormSubmit()" autocomplete="off">
+                    <div class="rows">
+                        <div class="col-md-12 mb-3" *ngIf="isIncorrectUsernamePassword" >
+                            <div class="alert alert-danger  alert-dismissible fade show" role="alert">
+                                Incorrect username or password.  
+                                <button type="button" id="closeIncorrect" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-5">
+                                <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
+                                <input id="username" type="text" placeholder="Username" required pInputText class="w-full md:w-30rem mb-2" style="padding:1rem"  formControlName="username"  [ngClass]="{ 'is-invalid': submitted && f.username.errors }" >
+                                <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                                    <div *ngIf="f.username.errors.required">Username is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-5">
+                                <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
+                                <input [type]="showPassword" id="password" class="p-inputtext p-component p-element ng-tns-c289-0 w-full p-3 md:w-30rem p-password-input mb-2" placeholder="Password" required formControlName="password"  [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
+                                <span class="p-input-icon-right atk_margin_5"><i [ngClass]="toggleEyes ? 'pi-eye-slash' : 'pi-eye'" class="ng-tns-c131-0 ng-star-inserted pi" (click)="toggleShowPassword()"></i></span>
+                                <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                                    <div *ngIf="f.password.errors.required">Password is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button pButton pRipple label="Sign In" class="w-full p-3 text-xl"></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

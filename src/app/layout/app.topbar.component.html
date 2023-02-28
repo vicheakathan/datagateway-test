@@ -1,0 +1,45 @@
+<div class="layout-topbar">
+    <a id="logo-image" class="layout-topbar-logo" href="/" style="justify-content: center;">
+        <!-- <img [src]="image_src" alt="logo" id="logo"> -->
+        <img src="assets/images/atechlogo.png" alt="logo" id="logo">
+    </a>
+
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
+    <div  class="atk_topbar_menu">
+        <label style="margin-right:30px;cursor: pointer;">
+            <input class='toggle-checkbox' type='checkbox' name="cheched" id="theme" onchange="theme()"/>
+            <div class='toggle-slot'>
+                <div class='sun-icon-wrapper' id="sun">
+                    <div class="iconify sun-icon" data-icon="feather-sun" data-inline="false"></div>
+                </div>
+                <div class='toggle-button'></div>
+                <div class='moon-icon-wrapper' id="moon">
+                    <div class="iconify moon-icon" data-icon="feather-moon" data-inline="false"></div>
+                </div>
+            </div>
+        </label>
+        <div #topbarmenubutton style="cursor: pointer; display: flex;justify-content: center;align-items: center;" (click)="layoutService.showProfileSidebar()">
+            <img src="assets/images/avatar.png" width="30" height="30">
+            <span style="display:block;margin-left:5px;font-weight:500;  text-transform: capitalize;">welcome {{username}}</span>
+            <i class="pi pi-sort-down" style="display: flex;justify-content: center;align-items: center;margin-left:5px"></i>
+        </div>  
+    </div>
+   
+    <div #topbarmenu class="atk_layout layout-topbar-menus" [ngClass]="{'layout-topbar-menu-mobile-active atk_layout_active': layoutService.state.profileSidebarVisible}" style="align-items: center;">
+        <button class="p-link layout-topbar-button" [routerLink]="'/settings'">
+            <i class="pi pi-cog"></i>
+            <span style="display:block;font-weight:500">Settings</span>
+        </button>
+        <button class="p-link layout-topbar-button" (click)="logout()">
+            <i class="pi pi-sign-out"></i>
+            <span style="display:block;font-weight:500">Logout</span>
+        </button>
+    </div>
+</div>
+
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+

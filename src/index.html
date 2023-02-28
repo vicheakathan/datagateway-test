@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!-- <title id="title">Data Gateway</title> -->
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" id="favIcon" type="image/x-icon" href="assets/images/atechlogo.png">
+    <link id="theme-css" rel="stylesheet" type="text/css" href="assets/layout/styles/theme/lara-light-blue/theme.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+</head>
+<div class="scrollToTop atk_pointer" id="scrollToTop" style="display: none;" onclick="scrollToTop();">
+    <i class="fa-solid fa-circle-up"></i>
+</div>
+<body onload="onload()">
+    <app-root></app-root>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+<script src="https://code.iconify.design/1/1.0.4/iconify.min.js">   </script>
+<script>
+    let mybutton = document.getElementById("scrollToTop");
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+        mybutton.style.display = "block";
+      } else {
+        mybutton.style.display = "none";
+      }
+    }
+
+    function scrollToTop() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+
+    if (localStorage.getItem("theme-url") != null)
+      document.getElementById('theme-css').href = localStorage.getItem("theme-url");
+
+    function theme() {
+      if ($("#theme").is(':checked') == true) {
+        localStorage.setItem("theme-url", "assets/layout/styles/theme/bootstrap4-dark-blue/theme.css");
+        localStorage.setItem("dark-theme", true);
+        // localStorage.setItem("logo-url", "assets/images/logo3.png");
+        
+      } else {
+        localStorage.setItem("theme-url", "assets/layout/styles/theme/lara-light-blue/theme.css");
+        localStorage.setItem("dark-theme", false);
+        // localStorage.setItem("logo-url", "assets/images/logo.png");
+      }
+
+      document.getElementById('theme-css').href = localStorage.getItem("theme-url");
+      // document.getElementById('logo').src = localStorage.getItem("logo-url");
+    }
+
+    function checkBool(x) {
+      if (x == "true")
+        return true;
+      else
+        return false;
+    }
+
+    function onload(){
+      if (localStorage.getItem("dark-theme") != null) {
+        var x = checkBool(localStorage.getItem("dark-theme"));
+        $("input[name='cheched']").prop('checked', checkBool(localStorage.getItem("dark-theme")));
+      }
+    }
+
+     
+    
+</script>
+</html>

@@ -1,0 +1,237 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="grid atk_margin_bottom_15">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-4 tk_header">
+            <ng-template pTemplate="left">
+                <div class="tk_button_search ">
+                    <input type="text" pInputText placeholder="Keyword" #searchValue class="mr-2">
+                    <button class="mr-2" type="button" pButton pRipple label="Search" (click)="onGlobalFilter(dt, searchValue .value)"></button>
+                    <button pButton pRipple label="Clear" icon="pi pi-filter-slash" class="p-button-outlined mr-2" (click)="clear(dt)"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+                <div class="my-2">
+                    <button pButton pRipple label="Add" icon="pi pi-plus" class="p-button-success mr-2" (click)="add()"></button>
+                    <button pButton pRipple label="Excel" icon="pi pi-upload" class="p-button-help mr-2" (click)="exportExcel()"></button>
+                </div>
+            </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <p-toast></p-toast>
+            <p-table #dt [value]="tenantModel" [lazy]="true" (onLazyLoad)="OnLoadDataSource($event)" dataKey="id"
+             (selectionChange)="onSelectionChange($event)" 
+            [globalFilterFields]="['date']"  responsiveLayout="scroll" [rowHover]="true"
+           >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th  pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                        <th style="width: 30%">Tenant Id</th>
+                        <th style="width: 20%">Name</th>
+                        <th>Company</th>
+                        <th style="min-width: 13rem;">Vat</th>
+                        <th style="min-width: 10rem;">Currency</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-tenantModel>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="tenantModel"></p-tableCheckbox>
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Date</span>
+                            {{ tenantModel.createAt | date : 'd/MM/yyyy, h:mm a' }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">id</span>
+                            {{ tenantModel.id.toUpperCase() }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Name</span>
+                            {{ tenantModel.name }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Company</span>
+                            <span *ngFor="let row of companyId">
+                                <span *ngIf="row.id == tenantModel.companyId">{{row.name}}</span>
+                            </span>
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Vat</span>
+                            <div *ngFor="let v of tenantModel.vatType">
+                                <div *ngIf="v.isExclude == true">
+                                    <span class="p-badge p-badge-success">Inclusive</span>
+                                </div>
+                                <div *ngIf="v.isExclude == false">
+                                    <span class="p-badge p-badge-info">Exclusive</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div *ngFor="let c of tenantModel.currency">
+                                <div *ngIf="c.currencyName == 'KHR'">
+                                    <span class="p-badge p-badge-success">{{c.currencyAbv}}</span>
+                                </div>
+                                <div *ngIf="c.currencyName == 'USD'">
+                                    <span class="p-badge p-badge-info">{{c.currencyAbv}}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success  mr-2" (click)="edit(tenantModel)"></button>
+                                <button pButton pRipple icon="pi pi-key" class="p-button-rounded p-button-warning  mr-2" (click)="changePasswordDailog(tenantModel)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr *ngIf="totalRecords == 0"><td colspan="10">No record found.</td></tr>
+                </ng-template>
+            </p-table>
+            <!-- <div style="border-top:1px solid #3f4b5b"></div> -->
+            <p-paginator
+                #paginator
+                [rows]="itemsPerPage"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [totalRecords]="totalRecords"
+                [rowsPerPageOptions]="pageSizeOptions"
+                [first]="firstRow"
+                (onPageChange)="paginate($event)"
+            ></p-paginator>
+        </div>
+
+
+        <p-dialog [(visible)]="tenantDailog" [header]="dailogTitleHeader" [modal]="true" class="p-fluid atk_dialog_width">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="name">Date</label>
+                    <p-calendar [(ngModel)]="date" (onSelect)="OnDateChange($event)" [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.createAt}"></p-calendar>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.createAt">Date is required.</small>
+                </div>
+                <div class="field">
+                    <label for="name">Company</label>
+                    <p-dropdown [options]="companyId" [(ngModel)]="tenantModelDialog.companyId" placeholder="Select a company" optionLabel="name" optionValue="id" [showClear]="true" [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.companyId}"></p-dropdown>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.companyId">Company is required.</small>
+                </div>
+                <div class="field">
+                    <label for="email">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="tenantModelDialog.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.name}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.name">Name is required.</small>
+                </div>
+                <div class="field">
+                    <label for="remoteCode">Remote Code</label>
+                    <input type="text" pInputText id="remoteCode" [(ngModel)]="tenantModelDialog.remoteCode" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.remoteCode}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.remoteCode">Remote code is required.</small>
+                </div>
+                <div class="field">
+                    <label for="address">Vat</label>
+                    <div *ngFor="let vat of vatType" class="field-checkbox">
+                        <div *ngFor="let v of tenantModelDialog.vatType">
+                            <div>
+                                <p-radioButton [inputId]="vat.key" name="vatType" [value]="vat.key" [(ngModel)]="v.isExclude"> </p-radioButton>
+                                <label [for]="vat.key" style="padding-left: 10px;">{{vat.name}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field" *ngFor="let v of tenantModelDialog.vatType">
+                        <label for="remoteCode">Percentage</label>
+                        <p-inputNumber [(ngModel)]="v.percentage" id="percentage" prefix="%" [required]="true" autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !v.percentage}">
+                        </p-inputNumber>
+                        <small class="ng-dirty ng-invalid" *ngIf="submitted && !v.percentage">Percentage is required.</small>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="address">Currency</label>
+                    <div *ngFor="let cur of currency" class="field-checkbox">
+                        <div *ngFor="let row of tenantModelDialog.currency">
+                            <div>
+                                <p-radioButton [inputId]="cur.currencyName" name="currency" [value]="cur.currencyName" [(ngModel)]="row.currencyName" (onClick)="onChangeCurrency(cur)"></p-radioButton>
+                                <label [for]="cur.currencyName" style="padding-left: 10px;">{{cur.currencyAbv}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="address">Address</label>
+                    <textarea id="address" pInputTextarea [(ngModel)]="tenantModelDialog.address" required rows="3" cols="20" [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.address}"></textarea>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.address">Address is required.</small>
+                </div>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" pInputTextarea [(ngModel)]="tenantModelDialog.description" required rows="3" cols="20" [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.description}"></textarea>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.description">Description is required.</small>
+                </div>
+                <div class="field" [style]="isDisplayNone">
+                    <label for="phone">Username</label>
+                    <input type="text" pInputText id="username" [disabled]="isDisabled" [(ngModel)]="tenantModelDialog.username" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.username}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.username">Username is required.</small>
+                </div>
+                <div class="field" [style]="isDisplayNone">
+                    <label for="phone">Password</label>
+                    <input [type]="showPassword" pInputText id="password" [disabled]="isDisabled" [(ngModel)]="tenantModelDialog.password" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.password}"/>
+                    <span class="p-input-icon-right" style="position: relative;display: inline-block;width:0;margin: 0px 0px 5px 0px;"><i [ngClass]="toggleEyes ? 'pi-eye-slash' : 'pi-eye'" class="ng-tns-c131-0 ng-star-inserted pi atk_eye_color" (click)="toggleShowPassword()"></i></span>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.password">Password is required.</small>
+                </div>
+                <div class="field tk_display_none">
+                    <input type="text" pInputText id="id" [(ngModel)]="tenantModelDialog.id" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.id}"/>
+                    <input type="text" pInputText id="imageUrl" [(ngModel)]="tenantModelDialog.imageUrl" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.imageUrl}"/>
+                    <input type="text" pInputText id="openDate" [(ngModel)]="tenantModelDialog.openDate" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.openDate}"/>
+                    <input type="text" pInputText id="closeDate" [(ngModel)]="tenantModelDialog.closeDate" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.closeDate}"/>
+                    <input type="text" pInputText id="isActive" [(ngModel)]="tenantModelDialog.isActive" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.isActive}"/>
+                    <input type="text" pInputText id="isBlocked" [(ngModel)]="tenantModelDialog.isBlocked" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.isBlocked}"/>
+                    <input type="text" pInputText id="isVerified" [(ngModel)]="tenantModelDialog.isVerified" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.isVerified}"/>
+                    <input type="text" pInputText id="isDeleted" [(ngModel)]="tenantModelDialog.isDeleted" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.isDeleted}"/>
+
+
+                    <div *ngFor="let vat of tenantModelDialog.vatType">
+                        <input type="text" pInputText id="isExclude" [(ngModel)]="vat.isExclude" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.isExclude}"/>
+                        <input type="text" pInputText id="vdate" [(ngModel)]="vat.date" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.date}"/>
+                        <input type="text" pInputText id="cd" [(ngModel)]="vat.cd" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.cd}"/>
+                        <input type="text" pInputText id="code" [(ngModel)]="vat.code" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.code}"/>
+                        <input type="text" pInputText id="vname" [(ngModel)]="vat.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.name}"/>
+                        <!-- <input type="text" pInputText id="percentage" [(ngModel)]="vat.percentage" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !vat.percentage}"/> -->
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="closeDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-success" (click)="update()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="tenantDailogChangePassword" [style]="{width:'25%'}" [header]="dailogTitleHeader" [modal]="true" class="p-fluid atk_dialog_width">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="name">Username</label>
+                    <input type="text" pInputText id="username" [(ngModel)]="tenantModelDialog.username" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.username}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.username">Username is required.</small>
+                </div>
+                <div class="field">
+                    <label for="name">Password</label>
+                    <input [type]="showPassword" pInputText #password [(ngModel)]="tenantModelDialog.password"  required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.password}" (change)="OnChangePassword(password.value)"/>
+                    <span class="p-input-icon-right" style="position: relative;display: inline-block;width:0;margin: 0px 0px 5px 0px;"><i [ngClass]="toggleEyes ? 'pi-eye-slash' : 'pi-eye'" class="ng-tns-c131-0 ng-star-inserted pi atk_eye_color" (click)="toggleShowPassword()"></i></span>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.password">Password is required.</small>
+                </div>
+                <div class="field tk_display_none">
+                    <label for="name">Other</label>
+                    <input type="text" pInputText #other_password [(ngModel)]="tenantModelDialog.other"  required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !tenantModelDialog.other}" />
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !tenantModelDialog.other">Password is required.</small>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="closeDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-success" (click)="updatePassword()"></button>
+            </ng-template>
+        </p-dialog>
+	</div>
+</div>

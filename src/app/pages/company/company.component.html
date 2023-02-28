@@ -1,0 +1,152 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="grid atk_margin_bottom_15">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-4 tk_header">
+            <ng-template pTemplate="left">
+                <div class="tk_button_search ">
+                    <input type="text" pInputText placeholder="Keyword" #searchValue class="mr-2">
+                    <button type="button" class="mr-2" pButton pRipple label="Search" (click)="onGlobalFilter(dt, searchValue .value)"></button>
+                    <button pButton pRipple label="Clear" icon="pi pi-filter-slash" class="p-button-outlined mr-2" (click)="clear(dt)"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+                <div class="my-2">
+                    <button pButton pRipple label="Add" icon="pi pi-plus" class="p-button-success mr-2" (click)="add()"></button>
+                    <button pButton pRipple label="Excel" icon="pi pi-upload" class="p-button-help mr-2" (click)="exportExcel(dt)"></button>
+                </div>
+            </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <p-toast></p-toast>
+            <p-table #dt [value]="company" [lazy]="true" (onLazyLoad)="OnLoadDataSource($event)" dataKey="id"
+             (selectionChange)="onSelectionChange($event)" [globalFilterFields]="['date']" responsiveLayout="scroll" [rowHover]="true">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-company>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="company"></p-tableCheckbox>
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Date</span>
+                            {{ company.createAt | date : 'd/MM/yyyy, h:mm a' }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Name</span>
+                            {{ company.name }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Email</span>
+                            {{ company.email }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Phone Number</span>
+                            {{ company.phone }}
+                        </td>
+                        <td style="width:20%; min-width:10rem;">
+                            <span class="p-column-title">Address</span>
+                            {{ company.address }}
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success  mr-2" (click)="edit(company)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr *ngIf="totalRecords == 0"><td colspan="10">No record found.</td></tr>
+                </ng-template>
+            </p-table>
+            <!-- <div style="border-top:1px solid #3f4b5b"></div> -->
+            <p-paginator
+                #paginator
+                [rows]="itemsPerPage"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [totalRecords]="totalRecords"
+                [rowsPerPageOptions]="pageSizeOptions"
+                [first]="firstRow"
+                (onPageChange)="paginate($event)"
+            ></p-paginator>
+        </div>
+
+
+        <p-dialog [(visible)]="companyDailog" [header]="dailogTitleHeader" [modal]="true" class="p-fluid atk_dialog_width">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="name">Date</label>
+                    <p-calendar [(ngModel)]="date" (onSelect)="OnDateChange($event)" [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.createAt}"></p-calendar>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.createAt">Date is required.</small>
+                </div>
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" pInputText id="name" [(ngModel)]="companys.name" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.name}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.name">Name is required.</small>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="text" pInputText id="email" [(ngModel)]="companys.email" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.email}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.email">Email is required.</small>
+                </div>
+                <div class="field">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" pInputText id="phone" [(ngModel)]="companys.phone" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.phone}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.phone">Phone number is required.</small>
+                </div>
+                <div class="field">
+                    <label for="address">Address</label>
+                    <textarea id="address" pInputTextarea [(ngModel)]="companys.address" required rows="3" cols="20" [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.address}"></textarea>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.address">Address is required.</small>
+                </div>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" pInputTextarea [(ngModel)]="companys.description" required rows="3" cols="20" [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.description}"></textarea>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !companys.description">Description is required.</small>
+                </div>
+                <div class="field tk_display_none">
+                    <input type="text" pInputText id="id" [(ngModel)]="companys.id" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.id}"/>
+                    <input type="text" pInputText id="username" [(ngModel)]="companys.username" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.username}"/>
+                    <input type="text" pInputText id="password" [(ngModel)]="companys.password" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.password}"/>
+                    <input type="text" pInputText id="hashCode" [(ngModel)]="companys.hashCode" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.hashCode}"/>
+                    <input type="text" pInputText id="lg" [(ngModel)]="companys.lg" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.lg}"/>
+                    <input type="text" pInputText id="lat" [(ngModel)]="companys.lat" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.lat}"/>
+                    <input type="text" pInputText id="url" [(ngModel)]="companys.url" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.url}"/>
+                    <input type="text" pInputText id="imageUrl" [(ngModel)]="companys.imageUrl" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.imageUrl}"/>
+                    <input type="text" pInputText id="website" [(ngModel)]="companys.website" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.website}"/>
+                    <input type="text" pInputText id="blockDate" [(ngModel)]="companys.blockDate" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.blockDate}"/>
+                    <input type="text" pInputText id="verifyDate" [(ngModel)]="companys.verifyDate" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.verifyDate}"/>
+                    <input type="text" pInputText id="deleteDate" [(ngModel)]="companys.deleteDate" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.deleteDate}"/>
+                    <input type="text" pInputText id="activedBy" [(ngModel)]="companys.activedBy" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.activedBy}"/>
+                    <input type="text" pInputText id="blockedBy" [(ngModel)]="companys.blockedBy" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.blockedBy}"/>
+                    <input type="text" pInputText id="verifiedBy" [(ngModel)]="companys.verifiedBy" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.verifiedBy}"/>
+                    <input type="text" pInputText id="deletedBy" [(ngModel)]="companys.deletedBy" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.deletedBy}"/>
+                    <input type="text" pInputText id="isActive" [(ngModel)]="companys.isActive" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.isActive}"/>
+                    <input type="text" pInputText id="isBlocked" [(ngModel)]="companys.isBlocked" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.isBlocked}"/>
+                    <input type="text" pInputText id="isVerified" [(ngModel)]="companys.isVerified" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.isVerified}"/>
+                    <input type="text" pInputText id="isDeleted" [(ngModel)]="companys.isDeleted" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.isDeleted}"/>
+                    <input type="text" pInputText id="userId" [(ngModel)]="companys.userId" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !companys.userId}"/>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-danger" (click)="closeDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-success" (click)="update()"></button>
+            </ng-template>
+        </p-dialog>
+	</div>
+</div>

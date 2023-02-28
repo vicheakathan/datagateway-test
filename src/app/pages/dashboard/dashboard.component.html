@@ -1,0 +1,128 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="grid atk_margin_bottom_15">
+    <div class="col-6 xl:col-6">
+        <div class="card">
+            <p-toolbar styleClass="mb-4 atk_dashboard">
+                <div class="p-toolbar-group-start">
+                    <h5>Yearly Charts Overview</h5>
+                </div>
+            </p-toolbar>
+            <div *ngIf="SaleSummaryYearly">
+                <canvas 
+                    baseChart
+                    [datasets]="SaleSummaryYearly.saleSummary"
+                    [labels]="SaleSummaryYearly.chartLabels"
+                    [options]="chartOptions"
+                    [legend]="chartLegend"
+                    [type]="SaleSummaryYearly.saleSummary.type"
+                >
+                </canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 xl:col-6">
+        <div class="card">
+            <p-toolbar styleClass="mb-4 atk_dashboard">
+                <div class="p-toolbar-group-start">
+                    <h5>Weekly Charts Overview</h5>
+                </div>
+            </p-toolbar>
+            <!-- <p-chart type="bar" [data]="data" [options]="chartOptions"></p-chart> -->
+            <div *ngIf="SaleSummaryWeekly">
+                <canvas 
+                    baseChart
+                    [datasets]="SaleSummaryWeekly.saleSummary"
+                    [labels]="SaleSummaryWeekly.chartLabels"
+                    [options]="chartOptions"
+                    [legend]="chartLegend"
+                    [type]="SaleSummaryWeekly.saleSummary.type"
+                >
+                </canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 xl:col-12">
+        <div class="card">
+            <p-toolbar styleClass="mb-4 atk_dashboard">
+                <div class="p-toolbar-group-start">
+                    <h5>Monthly Charts Overview</h5>
+                </div>
+                <div class="p-toolbar-group-end">
+                    <p-calendar [(ngModel)]="dateFilter" view="month" #month dateFormat="mm/yy" [readonlyInput]="true" inputId="monthpicker" class="mr-2" placeholder="Months" (onSelect)="onFilterByDate()"></p-calendar>
+                    <p-dropdown [options]="itemTenant" id="tenant" placeholder="All Tenants" optionLabel="name" optionValue="name" [showClear]="true" class="mr-2" (onChange)="onFilterByTenant($event)"></p-dropdown>
+                </div>
+            </p-toolbar>
+            <div *ngIf="SaleSummaryMonthly">
+                <canvas 
+                    baseChart
+                    [datasets]="SaleSummaryMonthly.saleSummary"
+                    [labels]="SaleSummaryMonthly.chartLabels"
+                    [options]="chartOptions"
+                    [legend]="chartLegend"
+                    [type]="chartType"
+                >
+                </canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <h5>Sales Overview</h5>
+            <span style="position: absolute;"><p-calendar 
+                [inputStyle]="{'display':'none'}" 
+                #calendar 
+                [(ngModel)]="rangeDates" 
+                (onSelect)="onDateChange($event)"
+                (onChange)="onDateChange($event)"
+            >
+            </p-calendar></span>
+            <p-table #dt [value]="dashboard" [lazy]="true" (onLazyLoad)="OnLoadDataSource($event)" dataKey="id"
+            [globalFilterFields]="['date']" responsiveLayout="scroll" [rowHover]="true">
+            
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th >Date <i class="pi pi-calendar atk_pointer" style="margin-left:5px" (click)="openCalendar()"></i>  </th>
+                        <th>Tenants</th>
+                        <th>SubTotal</th>
+                        <th>Discount</th>
+                        <th>Vat</th>
+                        <th>GrandTotal</th>
+                        <th>Amount Before Vat Discount</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-dashboard>
+                    <tr>
+                        <td style="min-width:5rem;">
+                            <span class="p-column-title">Date</span>
+                            {{ dashboard.orderDateTime | date : 'd/MM/yyyy' }}
+                        </td>
+                        <td style="min-width:5rem;">
+                            {{ dashboard.tenant }}
+                        </td>
+                        <td style="min-width:5rem;">
+                            {{ dashboard.subTotal | currency: dashboard.currency }}
+                        </td>
+                        <td style="min-width:5rem;">
+                            {{ dashboard.discount | currency: dashboard.currency }}
+                        </td>
+                        <td style="min-width:5rem;">
+                            {{ dashboard.vat | currency: dashboard.currency }}
+                        </td>
+                        <td style="min-width:5rem;">
+                           {{ dashboard.grandTotal | currency: dashboard.currency }}
+                        </td>
+                        <td style="min-width:5rem;">
+                            {{ dashboard.amount_before_vat_discount | currency: dashboard.currency }}
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr *ngIf="dashboard == 0"><td colspan="10">No record found.</td></tr>
+                </ng-template>
+            </p-table>
+        </div>
+	</div>
+</div>

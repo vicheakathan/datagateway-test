@@ -1,0 +1,188 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="grid atk_margin_bottom_15">
+    <div class="col-12">
+        <p-toolbar styleClass="mb-4 tk_header">
+            <ng-template pTemplate="left">
+                <div class="tk_button_search ">
+                    <p-dropdown class="mr-2" [options]="itemSaleStatus" [(ngModel)]="selectedStatus" placeholder="Status" optionLabel="name" optionValue="key" [showClear]="true" (onChange)="onFilterByStatus($event)"></p-dropdown>
+                    <p-dropdown [options]="itemTenant" id="tenant" placeholder="Tenants" optionLabel="name" optionValue="id" [showClear]="true" class="mr-2" (onChange)="onFilterByTenant($event)"></p-dropdown>
+                    <p-calendar [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" inputId="range" class="mr-2 tk_none_border"  placeholder="Start date - End date" #calendar (onSelect)="onChangeDate()"></p-calendar>
+                    <button class="mr-2" type="button" pButton pRipple label="Search" (click)="onGlobalFilter($event)"></button>
+                    <button pButton pRipple label="Clear" icon="pi pi-filter-slash" class="p-button-outlined mr-2" (click)="clear()"></button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+                <div class="my-2">
+                    <button pButton pRipple label="Excel" icon="pi pi-upload" class="p-button-help mr-2" (click)="exportExcel(dt)"></button>
+                </div>
+            </ng-template>
+        </p-toolbar>
+        <div class="card">
+            <p-toast></p-toast>
+            <p-table #dt [value]="transactionModel" [lazy]="true" (onLazyLoad)="OnLoadDataSource($event)" dataKey="id"
+             (selectionChange)="onSelectionChange($event)" [globalFilterFields]="['date']" responsiveLayout="scroll" [rowHover]="true"  
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                        <th>Task Id</th>
+                        <th>Tenant</th>
+                        <th>Status</th>
+                        <th>Data Details</th>
+                        <th>Error Log</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-transactionModel let-expanded="expanded">
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="transactionModel"></p-tableCheckbox>
+                        </td>
+                        <td style="max-width:10rem">
+                            <span class="p-column-title">Date</span>
+                            {{ transactionModel.createAt | date : 'd/MM/yyyy, h:mm a' }}
+                        </td>
+                        <td style="max-width:15rem">
+                            <span class="p-column-title">taskId</span>
+                            {{ transactionModel.taskId.toUpperCase() }}
+                        </td>
+                        <td >
+                            <span class="p-column-title">tenantName</span>
+                            {{ transactionModel.tenant }}
+                        </td>
+                        <td >
+                            <span class="p-column-title">isSuccess</span>
+                            <div *ngIf="transactionModel.isSuccess == true">
+                                <span class="p-badge p-badge-success">Success</span>
+                            </div>
+                            <div *ngIf="transactionModel.isSuccess == false">
+                                <span class="p-badge p-badge-danger">Fail</span>
+                            </div>
+                        </td>
+                        <td >
+                            <span class="p-column-title">data details</span>
+                            <i class="pi pi-exclamation-circle atk_pointer" (click)="OnShowSaleTransactionDetailDailog(transactionModel)" style="font-size: 1.5rem;color: #8dd0ff;" ></i>
+                        </td>
+                        <td>
+                            <div *ngIf="transactionModel.isSuccess == false">
+                                <i class="pi pi-exclamation-triangle atk_pointer" style="font-size: 1.5rem;color: #F59E0B;"  (click)="OnShowErrorLog(transactionModel)"></i>
+                            </div>
+                            <!-- <div *ngIf="transactionModel.isSuccess == false">
+                                <button type="button" [id]="transactionModel.id + 'error'" pButton pRipple [pRowToggler]="transactionModel" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+                                </button>
+                            </div> -->
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion" let-transactionModel>
+                    <tr>
+                        <td colspan="10" class="atk_hasExpansion">
+                            <p-table id="error" [value]="transactionModel.errorLog" dataKey="id" [scrollable]="true" scrollHeight="550px" responsiveLayout="scroll" >
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th style="max-width:15rem">Message</th>
+                                        <th >Data</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-errorLog>
+                                    <tr>
+                                        <td style="max-width:15rem">{{errorLog.errorLogs}}</td>
+                                        <td >{{errorLog.datalog}}</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr *ngIf="totalRecords == 0"><td colspan="10">No record found.</td></tr>
+                </ng-template>
+            </p-table>
+            <!-- <div style="border-top:1px solid #3f4b5b"></div> -->
+            <p-paginator
+                #paginator
+                [rows]="itemsPerPage"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [totalRecords]="totalRecords"
+                [rowsPerPageOptions]="pageSizeOptions"
+                [first]="firstRow"
+                (onPageChange)="paginate($event)"
+            ></p-paginator>
+        </div>
+
+
+        <p-dialog [(visible)]="showSaleTransactionDetailDailog" [style]="{width:'35%'}" [header]="dailogTitleHeader" [modal]="true" class="p-fluid atk_dialog_width">
+            <ng-template pTemplate="content">
+                <p-table [value]="saleTransactionDetailModel" dataKey="id" responsiveLayout="scroll" [rowHover]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Order Date</th>
+                            <th>Receipt Id</th>
+                            <th>Grand Total</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-saleTransactionDetailModel let-expanded="expanded">
+                        <tr>
+                            <td style="max-width:10rem">
+                                <span class="p-column-title">Date</span>
+                                {{ saleTransactionDetailModel.orderDateTime | date : 'd/MM/yyyy, h:mm a' }}
+                            </td>
+                            <td style="max-width:15rem">
+                                <span class="p-column-title">receiptId</span>
+                                {{ saleTransactionDetailModel.receiptId }}
+                            </td>
+                            <td style="max-width:15rem">
+                                <span class="p-column-title">receiptId</span>
+                                <div *ngIf="saleTransactionDetailModel.currency == 'Dollar'">
+                                    {{ saleTransactionDetailModel.grandTotal | currency:'USD' }}
+                                </div>
+                                <div *ngIf="saleTransactionDetailModel.currency == 'Riel'">
+                                    {{ saleTransactionDetailModel.grandTotal | currency:'R' }}
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-danger" (click)="closeDialog()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="showErrorLogDailog" [style]="{width:'70%'}" [header]="dailogTitleHeader" [modal]="true" class="p-fluid atk_dialog_width">
+            <ng-template pTemplate="content">
+                <p-table [value]="errorLogModel" dataKey="id" [rowHover]="true" responsiveLayout="stack" [breakpoint]="'960px'" >
+                    <ng-template pTemplate="header">
+                        <tr>    
+                            <th >Message</th>
+                            <th >Data</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-errorLogModel>
+                        <tr *ngFor="let row of errorLogModel.errorLog">
+                            <td style="min-width:15rem">
+                                <span class="p-column-title">dateLog</span>
+                                {{ row.errorLogs }}
+                            </td>
+                            <td style="word-break:break-all;">
+                                <span class="p-column-title">errorLogs</span>
+                                {{ row.datalog }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-danger" (click)="closeDialog()"></button>
+            </ng-template>
+        </p-dialog>
+	</div>
+</div>

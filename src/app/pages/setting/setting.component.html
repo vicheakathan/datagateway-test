@@ -1,0 +1,113 @@
+<div class="loading-container" *ngIf="isLoadingResults">
+    <div class="loading-speeding-wheel"></div>
+</div>
+
+<div class="grid atk_margin_bottom_15">
+    <div class="col-12">
+        <div class="card mb-3">
+            <h2 style="margin:0">Settings</h2>
+        </div>
+        <div class="card mb-3">
+            <p-toast></p-toast>
+            <fieldset class="form-group border p-3 reset">
+                <legend class="reset">Site Configuration</legend>
+                <form [formGroup]="formSiteConfiguration" (ngSubmit)="onSubmitData()" autocomplete="off" style="padding:1rem;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="siteTitle" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Site Title</label>
+                                <input id="siteTitle" pInputText type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="siteTitle" [ngClass]="{ 'is-invalid': submitted && validation.siteTitle.errors }">
+                                <div *ngIf="submitted && validation.siteTitle.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.siteTitle.errors.required">Site Title is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 tk_display_none">
+                            <div class="form-group mb-5">
+                                <label for="icon" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Fav Icon</label>
+                                <input pInputText type="hidden" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="icon" [ngClass]="{ 'is-invalid': submitted && validation.icon.errors }">
+                                <!-- <input id="icon" class="form-control" #fileIcon type="file" accept="image/*"(change)="processFile(fileIcon)" chooseLabel="Browse"> -->
+                                
+                                <div class="input-group ">
+                                    <label pbutton="" pripple="" label="Choose File" icon="pi pi-file" class="p-element p-ripple p-button-outlined p-button p-component" style="margin-right: 1px;padding: 0.5rem 0.75rem;" ng-reflect-label="Choose File" ng-reflect-icon="pi pi-file" (click)="OnChangeFileUploadIcon()">
+                                        <span class="p-button-icon p-button-icon-left pi pi-file" aria-hidden="true"></span><span class="p-button-label">Choose File</span><span class="p-ink"></span>
+                                    </label>
+                                    <input type="text" class="atk_pointer text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary" id="uploadFileIcon" style="border-top-left-radius: unset !important;border-bottom-left-radius: unset !important;flex: 1 1 auto;" (click)="OnChangeFileUploadIcon()" value="">
+                                    <input type="file" class="form-control" hidden id="UploadIcon" #fileLogo1 type="file" accept="image/*"(change)="processFile(fileLogo1)">
+                                </div>
+                                <div *ngIf="submitted && validation.icon.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.icon.errors.required">Fav icon is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="production" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Data Gateway Production Url</label>
+                                <input id="production" pInputText type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="production" [ngClass]="{ 'is-invalid': submitted && validation.production.errors }">
+                                <div *ngIf="submitted && validation.production.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.production.errors.required">Data Gateway Production url is required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row tk_display_none">
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="logo_1" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Logo 1</label>
+                                <input id="logo_1" pInputText type="hidden" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="logo_1" [ngClass]="{ 'is-invalid': submitted && validation.logo_1.errors }">
+                                <div class="input-group ">
+                                    <label pbutton="" pripple="" label="Choose File" icon="pi pi-file" class="p-element p-ripple p-button-outlined p-button p-component" style="margin-right: 1px;padding: 0.5rem 0.75rem;" ng-reflect-label="Choose File" ng-reflect-icon="pi pi-file" (click)="OnChangeFileUploadLogo1()">
+                                        <span class="p-button-icon p-button-icon-left pi pi-file" aria-hidden="true"></span><span class="p-button-label">Choose File</span><span class="p-ink"></span>
+                                    </label>
+                                    <input type="text" class="atk_pointer text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary" id="uploadFileLogo1" style="border-top-left-radius: unset !important;border-bottom-left-radius: unset !important;flex: 1 1 auto;" (click)="OnChangeFileUploadLogo1()" value="">
+                                    <input type="file" class="form-control" hidden id="UploadLogo1" #fileIcon type="file" accept="image/*"(change)="processFile(fileIcon)">
+                                </div>
+                                <div *ngIf="submitted && validation.logo_1.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.logo_1.errors.required">Logo 1 is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="logo_2" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Logo 2</label>
+                                <input id="logo_2" pInputText type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="logo_2" [ngClass]="{ 'is-invalid': submitted && validation.logo_2.errors }">
+                                <div *ngIf="submitted && validation.logo_2.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.logo_2.errors.required">Logo 2 is required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <input id="id" type="hidden" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="id" [ngClass]="{ 'is-invalid': submitted && validation.id.errors }">
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="production" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Localhost Url</label>
+                                <input id="local" pInputText type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="local" [ngClass]="{ 'is-invalid': submitted && validation.local.errors }">
+                                <div *ngIf="submitted && validation.local.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.local.errors.required">Localhost url is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-5">
+                                <label for="integration" style="font-weight: 500!important;color: var(--surface-900)!important;margin-bottom: 0.5rem;">Mall Integration Url</label>
+                                <input id="integration" pInputText type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" required formControlName="integration" [ngClass]="{ 'is-invalid': submitted && validation.integration.errors }">
+                                <div *ngIf="submitted && validation.integration.errors" class="invalid-feedback">
+                                    <div *ngIf="validation.integration.errors.required">Mall Integration url is required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6" style="display: flex;justify-content: right;">
+                            <div class="form-group">
+                                <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-success"></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+	</div>
+</div>

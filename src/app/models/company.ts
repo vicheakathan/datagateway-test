@@ -1,0 +1,35 @@
+export interface CompanyModel {
+    id?: any;
+    title?: any;
+    createAt?: any;
+    address?: any;
+    url?: any;
+    imageUrl?: any;
+    username?: any;
+    password?: any;
+    website?: any;
+    email?: any;
+    phone?: any;
+    activeDate?: any;
+    blockDate?: any;
+    verifyDate?: any;
+    deleteDate?: any;
+    activedBy?: any;
+    blockedBy?: any;
+    verifiedBy?: any;
+    deletedBy?: any;
+    hashCode?: any;
+    lg?: any;
+    lat?: any;
+    tanants?: [];
+    userId?: any;
+    name?: any;
+    description?: any;
+    getData?: any;
+    isActive?: any;
+    isBlocked?: any;
+    isVerified?: any;
+    isDeleted?: any;
+    api_key?: any;
+    api_type?: any;
+  }
